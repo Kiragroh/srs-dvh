@@ -3,6 +3,11 @@
 HDSS is a structure representation, not a DVH algorithm. The two figure panels
 answer different questions; they are not alternative import routes.
 
+The current figure defaults to the new [surface/grid option](surface_grid.md).
+Use `--method full` to reproduce the earlier full-voxel-volume comparison.
+The evidence below about full-volume integration remains separate from the
+surface/grid results on all 154 individually stored GTV readouts.
+
 - **A — preservation:** use the same fine dose and the same independent 3D
   calculation on the original target and the target recovered from HDSS.
   Agreement demonstrates source preservation under this evaluation.

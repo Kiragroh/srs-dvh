@@ -20,13 +20,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install
-        run: python -m pip install -e ".[contours,dev,examples]"
+        run: python -m pip install -e ".[contours,surfaces,dev,examples]"
       - name: Test numerical core and contour adapter
         run: python -m pytest tests -q
       - name: Run standalone examples
         run: |
           python examples/quickstart.py
           python examples/oblique_contours.py
+          python examples/surface_grid.py
           python examples/plot_hdss_forward_validation.py --output results/forward_01_12.png
           python examples/plot_hdss_forward_validation.py --group 2 --output results/forward_13_24.png
       - name: Reproduce analytical benchmark

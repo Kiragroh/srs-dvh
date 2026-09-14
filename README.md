@@ -20,12 +20,18 @@ mathematical dose fields and finer integration. This verifies the calculation
 for its declared geometry; it does not establish that the geometry model
 reproduces a native TPS's reconstructed boundary or sampled DVH volume.
 
-![Two questions: preservation of the target by HDSS, and separate agreement with the native TPS DVH](docs/hdss_forward_validation.png)
+![Surface/grid method: HDSS source preservation and separate native TPS agreement](docs/hdss_forward_validation.png)
+
+**New in 0.2: choose full-volume integration or surface/grid evaluation.**
+The figure now shows the surface/grid option. It reconstructs an explicit
+surface and counts interior dose-grid points. All 120 source/HDSS pairs agree
+exactly under this method; only 6/154 complete GTV histograms match the native
+TPS. [Method, all-target results and runnable example](docs/surface_grid.md).
 
 | Question | What is compared? | What does this benchmark show? |
 |---|---|---|
 | **A. Does HDSS retain the original target?** | Original target versus recovered HDSS target, using the same fine dose and the same 3D calculation. | Yes: all 120 target/plan representations recover the original source voxels. The checked dose metrics agree within 0.0001 Gy. |
-| **B. Does our DVH match the native TPS?** | The stored native TPS DVH versus independent full-volume calculation on the recovered HDSS target. | Agreement is not established. The evaluated volumes differ; the curve gap alone proves neither a TPS error nor damage caused by HDSS. |
+| **B. Does our DVH match the native TPS?** | The stored native TPS DVH versus the selected independent method on the recovered HDSS target. | General agreement is not established. The evaluated volumes differ; the curve gap alone proves neither a TPS error nor damage caused by HDSS. |
 
 **The common reference is a declared target, the same dose and the same verified
 3D calculation.** HDSS can preserve the target information needed for that
@@ -46,14 +52,15 @@ Python 3.10 or newer. Clone the repository and install locally:
 ```sh
 git clone https://github.com/Kiragroh/srs-dvh.git
 cd srs-dvh
-python -m pip install -e ".[contours,dev,examples]"
+python -m pip install -e ".[contours,surfaces,dev,examples]"
 python examples/quickstart.py
 python -m pytest tests -q
 ```
 
 The package is distributed through this repository; these instructions do not
 assume a PyPI release. NumPy and SciPy are the core dependencies. Shapely is
-needed for the polygon adapter; Matplotlib only for the example figure.
+needed for the polygon adapter; scikit-image and VTK for the optional surface
+adapter; Matplotlib for example figures.
 
 ## Use with your own arrays
 

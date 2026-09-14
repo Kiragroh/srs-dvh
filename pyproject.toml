@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "srs-dvh"
-version = "0.1.0"
+version = "0.2.0"
 description = "Independent physical-space volume integration for small-target DVH research"
 readme = "README.md"
 license = "MIT"
@@ -15,6 +15,7 @@ dependencies = ["numpy>=1.24", "scipy>=1.10"]
 
 [project.optional-dependencies]
 contours = ["shapely>=2.1"]
+surfaces = ["scikit-image>=0.23", "vtk>=9.3"]
 dev = ["pytest>=8", "build>=1.2", "twine>=6"]
 examples = ["matplotlib>=3.8"]
 
