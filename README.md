@@ -10,12 +10,21 @@ coordinates, independently of CT slice spacing and dose-grid spacing.
 method even when the supplied dose field is unchanged. Replanning on changed
 structures can additionally change the dose field. These are different effects.
 
-![Synthetic example separating volume sampling from dose-grid effects](docs/analytical_srs_dvh.png)
+![Actual benchmark: initial disagreement, HDSS source preservation, and remaining native-reference difference](docs/hdss_forward_validation.png)
 
-*A known 6.5-mm³ sphere in a deliberately steep mathematical dose field. Left:
-sampling only on 1-mm planes changes the evaluated volume distribution. Right:
-fine integration cannot recover information lost from a coarsely sampled input
-dose. This is an analytical example, not a measured vendor or clinical error.*
+*Twelve consecutive synthetic targets from the research benchmark. Left: the
+initial stored-native versus regular-dose-export disagreement. Middle: the
+original binary source and the independently recovered HDSS body give the same
+full-3D readout on the same fine dose. Right: their difference from the stored
+native histogram remains visible.*
+
+**Forward source preservation is demonstrated; native TPS equivalence is not
+yet established.** The forward test recovered all 120 source voxel bodies and
+checked 120 DVHs: 72 planning targets and 48 GTV readouts in the PTV plans.
+The largest source-versus-HDSS dose-metric
+difference was below 0.0001 Gy at 0.05-mm integration. This checks preservation of
+the specified binary volume, not identity with a proprietary reconstructed
+surface or native histogram. [Evidence and scope](docs/forward_validation.md).
 
 ## Install and run
 
@@ -86,6 +95,12 @@ absolute D98 error against the exact continuous-dose result is **0.0012 Gy**.
 The largest curve error on the benchmark's stated plotting thresholds is
 **0.157 percentage points**. These are results for those test fields, not a
 universal accuracy guarantee. [Results and scope](docs/validation.md).
+
+![Independent mathematical accuracy test](docs/analytical_srs_dvh.png)
+
+*Separate analytic validation: a known 6.5-mm³ sphere in a deliberately steep
+dose field. The exact reference is mathematical. These curves do not stand in
+for the actual benchmark's native-TPS comparison.*
 
 ```sh
 python examples/analytical_benchmark.py --output-dir results/analytical

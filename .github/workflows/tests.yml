@@ -27,6 +27,8 @@ jobs:
         run: |
           python examples/quickstart.py
           python examples/oblique_contours.py
+          python examples/plot_hdss_forward_validation.py --output results/forward_01_12.png
+          python examples/plot_hdss_forward_validation.py --group 2 --output results/forward_13_24.png
       - name: Reproduce analytical benchmark
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.13'
         run: python examples/analytical_benchmark.py --output-dir results/analytical
