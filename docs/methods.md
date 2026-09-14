@@ -1,5 +1,10 @@
 # Method and input contract
 
+For a less technical explanation, start with [How the DVH is calculated](dvh_explained.md).
+The full-volume method below and the [discrete surface/grid method](surface_grid.md)
+are separate evaluation options. The latter does not use subvoxel dose interpolation
+or the full-volume convergence loop.
+
 ## Three independent resolutions
 
 1. **Geometry:** the represented body, its boundary and physical position.
@@ -36,12 +41,23 @@ This adapter describes prisms. It does not infer a continuous surface between
 different polygons, end-cap conventions, gaps or a manufacturer's reconstruction.
 Those choices must be established and documented by the calling reader.
 
+`SurfaceROI` describes a supplied closed, consistently wound surface. With
+`calculate`, it uses an interior midpoint grid and must be refined. With
+`calculate_grid_centres`, it instead selects existing dose-grid centres strictly
+inside the surface and gives them full dose-cell weights. These have different
+boundary-volume definitions even when they use the same surface.
+
 ## Dose and the cumulative DVH
 
-`DoseGrid` samples the supplied grid using trilinear interpolation. Evaluation
+In full-volume integration, `DoseGrid` samples the supplied grid using trilinear interpolation. Evaluation
 outside its centre-to-centre domain raises an error; there is no silent zero
 padding or extrapolation. A callable can instead supply an analytical dose field.
 Values are in Gy.
+
+The discrete surface/grid function reads the stored grid values directly. Its
+default requires the surface to fit in the dose-centre domain; the explicit
+`available_grid` option examines only the supplied finite domain. It is not a
+full-target coverage guarantee.
 
 For doses `d_i` and positive physical volume weights `w_i`, the cumulative relative
 DVH at threshold `t` is:

@@ -1,9 +1,15 @@
 # Surface and dose-grid-centre DVHs
 
+[Start with the illustrated explanation of both methods](dvh_explained.md).
+
 Version 0.2 adds a selectable surface/grid method alongside full-volume
 integration. It is useful when investigating a TPS that evaluates a reconstructed
 surface at discrete dose points. It is **not a verified copy of a native TPS
 algorithm** and does not automatically replace full-volume integration.
+
+“Closer to the native TPS” describes the measured benchmark agreement. It does
+not establish greater numerical accuracy for the complete target volume or an
+automatic advantage over a sufficiently refined slice-based integrator.
 
 ```bash
 python -m pip install -e ".[surfaces]"

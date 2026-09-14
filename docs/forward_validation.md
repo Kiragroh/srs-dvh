@@ -80,8 +80,12 @@ A fixed diagnostic on GTV01 keeps the fine dose field unchanged:
 The fixed surface is an unsmoothed MC0.5 reconstruction, not an assertion about
 the TPS's true internal surface. The first three rows use the same local dose
 map. The grid-centre calculation reproduces the complete native histogram for
-this target, but only **2/24 complete histograms** across the tested GTVs. It
-must not replace the full-volume reference merely to improve agreement.
+this target, but only **2/24 complete histograms** in the original GTV-only plan.
+The extended source-frame/grid-matched comparison covers **154 GTV readouts
+across seven plans**, with **6 exact histograms** in total, including those two.
+These counts describe different scopes, not conflicting results. The method is
+available for native comparisons; closer agreement alone is not a reason to
+change the reference definition in a transfer study.
 
 The remaining native-minus-grid-centre D98 differences range from −0.002 to
 +0.958 Gy. Native reconstruction and sampling are therefore not fully

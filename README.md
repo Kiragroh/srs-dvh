@@ -2,48 +2,51 @@
 
 [![Tests](https://github.com/Kiragroh/srs-dvh/actions/workflows/tests.yml/badge.svg)](https://github.com/Kiragroh/srs-dvh/actions/workflows/tests.yml)
 
-**A 3D DVH builder for high-definition, HDSS-like structures**, with particular
-attention to small SRS targets. Integrate the full supplied body in physical
-coordinates, independently of CT slice spacing and dose-grid spacing.
+**A DVH builder for high-definition, HDSS-like structures**, with particular
+attention to small SRS targets. It offers two explicit evaluation methods in
+physical coordinates; neither requires reducing the structure to CT slices.
 
 **HDSS carries detailed structure information. It does not define how a DVH is
 calculated.** A DVH also depends on the dose grid, the reconstructed boundary and
 which volume is counted. Two programs can therefore read the same structure
 information and still show different DVHs.
 
-This builder evaluates the full supplied 3D body without reducing it to CT
-slices. For a fair transfer comparison, keep the dose and calculation method
-fixed and change only the structure representation.
+| Method | How it calculates the DVH | Purpose |
+|---|---|---|
+| **Full-volume integration** — `calculate` / `converge` | Subdivide the represented body, evaluate dose throughout it, and accumulate positive physical volume weights. | Common fixed-dose transfer comparison, with numerical refinement checks. |
+| **Surface + dose-grid points** — `calculate_grid_centres` | Reconstruct or supply a surface; count only existing interior dose-grid centres, each with a complete dose-cell volume. | Investigate discrete native TPS readouts; boundary cells are not fractionally weighted. |
 
-**Accurate for which body?** Numerical accuracy is tested against known
-mathematical dose fields and finer integration. This verifies the calculation
-for its declared geometry; it does not establish that the geometry model
-reproduces a native TPS's reconstructed boundary or sampled DVH volume.
+The surface/grid method is **closer to the native TPS in this benchmark**. It is
+not established as a more accurate full-volume calculation. Its sampled volume
+can differ from the source or mesh volume. For a fair transfer comparison, keep
+the dose, geometry interpretation and evaluation rule fixed.
+
+## Why this matters for small structures
+
+A 6.5-mm³ sphere is only about **2.32 mm across**. With 1-mm sections, a few
+cross-sections can dominate the readout. Their position can change which boundary
+regions contribute; in a steep SRS dose gradient, this can change coverage metrics
+such as D98 even at unchanged physical dose.
+
+Full-volume integration samples through the represented volume; `converge`
+checks stability under refinement. This addresses a coarse plane-only evaluation;
+**a properly refined slice-by-slice integrator can also be accurate**. For larger
+targets and gentle gradients the difference may be small. Fine integration does
+not restore detail already missing from the supplied structure or dose grid.
+
+[How both methods work, with a schematic and a small-versus-large example](docs/dvh_explained.md).
 
 ![Surface/grid method: HDSS source preservation and separate native TPS agreement](docs/hdss_forward_validation.png)
 
-**New in 0.2: choose full-volume integration or surface/grid evaluation.**
-The figure now shows the surface/grid option. It reconstructs an explicit
-surface and counts interior dose-grid points. All 120 source/HDSS pairs agree
-exactly under this method; only 6/154 complete GTV histograms match the native
-TPS. [Method, all-target results and runnable example](docs/surface_grid.md).
+The figure shows **Surface + dose-grid points**. All 120 original/recovered-HDSS
+pairs agree exactly under this method. Native TPS agreement is a different test:
+**6/154 complete GTV histograms** match. The earlier **2/24** result refers to
+the original GTV-only subset; the 154 readouts span seven plans of the same 24
+synthetic target designs. [All-target results and runnable example](docs/surface_grid.md).
 
-| Question | What is compared? | What does this benchmark show? |
-|---|---|---|
-| **A. Does HDSS retain the original target?** | Original target versus recovered HDSS target, using the same fine dose and the same 3D calculation. | Yes: all 120 target/plan representations recover the original source voxels. The checked dose metrics agree within 0.0001 Gy. |
-| **B. Does our DVH match the native TPS?** | The stored native TPS DVH versus the selected independent method on the recovered HDSS target. | General agreement is not established. The evaluated volumes differ; the curve gap alone proves neither a TPS error nor damage caused by HDSS. |
-
-**The common reference is a declared target, the same dose and the same verified
-3D calculation.** HDSS can preserve the target information needed for that
-comparison. It is not a universal DVH convention or automatically supported by
-every receiving system. The 120 readouts comprise 72 planning targets plus 48
-GTV evaluations in the PTV plans. [Evidence and scope](docs/forward_validation.md).
-
-In one target, the complete source body occupies **5.952 mm³**, but the native
-DVH counts **4.644 mm³**. A fixed surface-and-grid diagnostic reproduces that
-histogram at unchanged fine dose. It reproduces only 2/24 complete histograms,
-so it is evidence about evaluation choices, not a replacement reference or a
-general native-TPS implementation.
+Numerical accuracy is tested against known mathematical dose fields and finer
+integration for each declared body model. Agreement with a native TPS is checked
+separately. [Measured preservation and native-agreement evidence](docs/forward_validation.md).
 
 ## Install and run
 
@@ -91,6 +94,7 @@ shift, dose scaling or threshold is fitted to a reference TPS curve.
 | `VoxelROI` | Complete occupied binary voxels, including the outer half-voxel extent |
 | `ImplicitROI` | A mathematical body specified by a physical-space predicate and bounding box |
 | `PolygonSlabROI` | Polygons with holes and explicit slab intervals on parallel, possibly oblique planes |
+| `SurfaceROI` with `calculate` | Interior of a supplied closed surface, using refined midpoint volume integration |
 | Custom adapter | `quadrature(step_mm)` yielding physical points and positive volume weights |
 
 High-definition source planes can be evaluated in their own basis without first
@@ -105,9 +109,10 @@ planes. See the [methods and input contract](docs/methods.md).
 
 ## Accuracy and examples
 
-The repository contains **18 tests** covering known spherical DVHs, oblique and
+The repository contains **25 tests** covering known spherical DVHs, oblique and
 anisotropic coordinates, unequal volume weights, holes, tiny contour caps,
-out-of-grid rejection and refinement checks.
+out-of-grid rejection and refinement checks, plus surface reconstruction,
+discrete grid sampling, nested cavities and explicit partial coverage.
 
 The [analytical benchmark](examples/analytical_benchmark.py) uses four
 sphere/ellipsoid configurations. At 0.025-mm integration spacing, its largest
