@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "srs-dvh"
+version = "0.1.0"
+description = "Independent physical-space volume integration for small-target DVH research"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Max Grohmann"}]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "scipy>=1.10"]
+
+[project.optional-dependencies]
+contours = ["shapely>=2.1"]
+dev = ["pytest>=8", "build>=1.2", "twine>=6"]
+examples = ["matplotlib>=3.8"]
+
+[project.urls]
+Repository = "https://github.com/Kiragroh/srs-dvh"
+Issues = "https://github.com/Kiragroh/srs-dvh/issues"
+Documentation = "https://github.com/Kiragroh/srs-dvh/blob/main/docs/methods.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]

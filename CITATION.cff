@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "Please cite this software and the specific version used in your analysis."
+type: software
+title: "srs-dvh: A 3D DVH builder for high-definition structures"
+authors:
+  - family-names: Grohmann
+    given-names: Max
+version: 0.1.0
+date-released: 2026-09-14
+license: MIT
+repository-code: "https://github.com/Kiragroh/srs-dvh"
+url: "https://github.com/Kiragroh/srs-dvh"
+keywords:
+  - dose-volume histogram
+  - stereotactic radiosurgery
+  - radiotherapy
+  - HDSS
+  - numerical integration
