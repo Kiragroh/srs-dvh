@@ -6,25 +6,38 @@
 attention to small SRS targets. Integrate the full supplied body in physical
 coordinates, independently of CT slice spacing and dose-grid spacing.
 
-**Why this matters:** a changed DVH can reflect a changed structure or evaluation
-method even when the supplied dose field is unchanged. Replanning on changed
-structures can additionally change the dose field. These are different effects.
+**HDSS carries detailed structure information. It does not define how a DVH is
+calculated.** A DVH also depends on the dose grid, the reconstructed boundary and
+which volume is counted. Two programs can therefore read the same structure
+information and still show different DVHs.
 
-![Actual benchmark: initial disagreement, HDSS source preservation, and remaining native-reference difference](docs/hdss_forward_validation.png)
+This builder evaluates the full supplied 3D body without reducing it to CT
+slices. For a fair transfer comparison, keep the dose and calculation method
+fixed and change only the structure representation.
 
-*Twelve consecutive synthetic targets from the research benchmark. Left: the
-initial stored-native versus regular-dose-export disagreement. Middle: the
-original binary source and the independently recovered HDSS body give the same
-full-3D readout on the same fine dose. Right: their difference from the stored
-native histogram remains visible.*
+**Accurate for which body?** Numerical accuracy is tested against known
+mathematical dose fields and finer integration. This verifies the calculation
+for its declared geometry; it does not establish that the geometry model
+reproduces a native TPS's reconstructed boundary or sampled DVH volume.
 
-**Forward source preservation is demonstrated; native TPS equivalence is not
-yet established.** The forward test recovered all 120 source voxel bodies and
-checked 120 DVHs: 72 planning targets and 48 GTV readouts in the PTV plans.
-The largest source-versus-HDSS dose-metric
-difference was below 0.0001 Gy at 0.05-mm integration. This checks preservation of
-the specified binary volume, not identity with a proprietary reconstructed
-surface or native histogram. [Evidence and scope](docs/forward_validation.md).
+![Two questions: preservation of the target by HDSS, and separate agreement with the native TPS DVH](docs/hdss_forward_validation.png)
+
+| Question | What is compared? | What does this benchmark show? |
+|---|---|---|
+| **A. Does HDSS retain the original target?** | Original target versus recovered HDSS target, using the same fine dose and the same 3D calculation. | Yes: all 120 target/plan representations recover the original source voxels. The checked dose metrics agree within 0.0001 Gy. |
+| **B. Does our DVH match the native TPS?** | The stored native TPS DVH versus independent full-volume calculation on the recovered HDSS target. | Agreement is not established. The evaluated volumes differ; the curve gap alone proves neither a TPS error nor damage caused by HDSS. |
+
+**The common reference is a declared target, the same dose and the same verified
+3D calculation.** HDSS can preserve the target information needed for that
+comparison. It is not a universal DVH convention or automatically supported by
+every receiving system. The 120 readouts comprise 72 planning targets plus 48
+GTV evaluations in the PTV plans. [Evidence and scope](docs/forward_validation.md).
+
+In one target, the complete source body occupies **5.952 mm³**, but the native
+DVH counts **4.644 mm³**. A fixed surface-and-grid diagnostic reproduces that
+histogram at unchanged fine dose. It reproduces only 2/24 complete histograms,
+so it is evidence about evaluation choices, not a replacement reference or a
+general native-TPS implementation.
 
 ## Install and run
 

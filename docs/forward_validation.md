@@ -1,13 +1,19 @@
-# Forward HDSS preservation and native-reference agreement
+# What HDSS preserves, and why a DVH can still differ
 
-The benchmark asks two different questions:
+HDSS is a structure representation, not a DVH algorithm. The two figure panels
+answer different questions; they are not alternative import routes.
 
-1. Can HDSS recover the original high-definition source body and retain its DVH
-   under the same independent evaluator?
-2. Does that independent evaluator reproduce the stored native TPS histogram?
+- **A — preservation:** use the same fine dose and the same independent 3D
+  calculation on the original target and the target recovered from HDSS.
+  Agreement demonstrates source preservation under this evaluation.
+- **B — native agreement:** compare a stored native TPS DVH with our independent
+  calculation on the recovered HDSS target. Now the evaluation method changes.
+  Agreement has not been established; this is not evidence of a vendor error.
 
-The first check passes for the tested inputs. The second still has a material
-residual and must not be described as solved.
+For transfer studies, the common reference is explicitly defined geometry,
+unchanged dose and one verified 3D method. Matching a proprietary native DVH is
+a separate validation question. A system needs both preservation of the fine
+structure and evaluation that uses that detail to benefit from HDSS.
 
 ## Forward input check
 
@@ -43,9 +49,47 @@ whereas the full source body occupies **5.952 mm³**. The native boundary/inclus
 convention has not been reproduced for all targets. More quadrature points do
 not, by themselves, resolve a difference in the represented volume.
 
-The figure therefore retains the native residual. Agreement between the
-original and recovered HDSS bodies must not be presented as native TPS
-equivalence or proof that one TPS is clinically more accurate.
+The remaining gap has not been fully explained. Neither curve should be
+labelled the clinical truth solely because it looks smoother or resembles a
+TPS display. Independent accuracy on mathematical test cases and agreement
+with a native TPS answer different questions.
+
+The earlier comparison used the regular 1-mm dose export rather than the fine
+local dose maps. It also used a different evaluated volume from the native TPS.
+It therefore mixed dose representation and evaluation method; its separation
+must not be attributed to structure export alone. Those earlier numerical
+curves remain in the data as `regular_dose_pct`, but are not one of the two main
+figure panels.
+
+## Where can the native difference arise?
+
+A fixed diagnostic on GTV01 keeps the fine dose field unchanged:
+
+| Evaluated body / sampling | Counted volume [mm³] | D98 [Gy] |
+|---|---:|---:|
+| Complete source voxel body, fine integration | 5.952 | 18.72 |
+| Fixed interpolated surface, fine integration | 5.730 | 19.32 |
+| Only interior dose-grid centres of that surface | 4.644 | 20.78 |
+| Stored native TPS DVH | 4.644 | 20.78 |
+
+The fixed surface is an unsmoothed MC0.5 reconstruction, not an assertion about
+the TPS's true internal surface. The first three rows use the same local dose
+map. The grid-centre calculation reproduces the complete native histogram for
+this target, but only **2/24 complete histograms** across the tested GTVs. It
+must not replace the full-volume reference merely to improve agreement.
+
+The remaining native-minus-grid-centre D98 differences range from −0.002 to
++0.958 Gy. Native reconstruction and sampling are therefore not fully
+identified. The earlier 1-mm dose readout for GTV01 was 17.77 Gy: changing input
+dose resolution alone changes that readout by 0.94 Gy under the same voxel-body
+model. These sequential contrasts depend on the stated order; they are not
+independent fractions of vendor error.
+
+[All 24 numerical diagnostics](../examples/data/evaluation_components.json)
+are included. Refining the surface integration from 0.05 to 0.025 mm changes
+the checked metrics by at most 0.023 Gy and the full empirical DVH by 0.306
+percentage points. That is a sensitivity check, not a proof of the native
+boundary rule or a rigorous error bound.
 
 ## Reproduce the figure
 
