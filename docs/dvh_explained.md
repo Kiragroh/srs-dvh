@@ -7,6 +7,31 @@ the evaluator must still use it.
 
 ![Coarse plane sampling, fine volume sampling, and the relative importance of a 1-mm slab](sampling_explained.svg)
 
+## The direct HDSS comparison
+
+The [main figure](hdss_sampling_comparison.png) holds the recovered HDSS surface
+and fine input dose map fixed. It compares actual 1-mm CT-plane-only sampling
+with the 3D surface/grid method. Across the 24 original GTVs, mean absolute D98
+disagreement with the native TPS falls from **0.601 to 0.234 Gy**; mean-dose
+disagreement falls from **0.309 to 0.096 Gy**. This is improved agreement with
+the native comparator, whose remaining differences stay visible.
+
+The coarse method uses 0.025-mm midpoint sampling within each CT plane, a 1-mm
+depth weight and trilinear dose interpolation. Its 0.05-to-0.025-mm in-plane
+refinement changes D98 by at most 0.062 Gy. The 3D method instead reads existing
+fine dose-grid centres inside the same surface. Thus this comparison changes
+both depth sampling and the dose-sampling rule. It does not test every possible
+slice-based implementation. The displayed curves share 0.2-Gy bins; each is
+normalized to its own evaluated volume. Scalar dose metrics are unbinned.
+
+The [numerical evidence](../examples/data/hdss_sampling_comparison.json) includes
+all 24 targets. Rebuild either twelve-target panel group from the repository root:
+
+```sh
+python examples/plot_hdss_sampling_comparison.py
+python examples/plot_hdss_sampling_comparison.py --group 2 --output results/group2.png
+```
+
 ## What “slice by slice” means here
 
 The limited comparison in this project evaluates selected cross-sections, assigns
@@ -106,7 +131,7 @@ or a steep boundary gradient can still need fine evaluation.
 |---|---|
 | Does fine full-volume integration work for its stated inputs? | Analytical and refinement tests verify the numerical calculation for specified geometry and dose. |
 | Can HDSS retain the information needed by either method? | All 120 benchmark source bodies are recovered exactly; paired DVHs agree within 0.0001 Gy for checked full-volume metrics and exactly for the surface/grid method. |
-| Have we reproduced the native TPS algorithm? | No universal match: 6/154 complete GTV histograms match under the surface/grid method; the other residuals remain visible. The earlier 2/24 refers only to the original GTV-only subset. |
+| Have we reproduced the native TPS algorithm? | The 3D HDSS method is closer overall than the tested coarse-plane readout, while residual differences remain. This is a reusable approach rather than a claim to reproduce an undocumented native algorithm exactly. |
 
 The DICOM source-plane description permits planes independent of actual image
 slices and supports retaining the originating grid. It does not select a DVH

@@ -2,51 +2,50 @@
 
 [![Tests](https://github.com/Kiragroh/srs-dvh/actions/workflows/tests.yml/badge.svg)](https://github.com/Kiragroh/srs-dvh/actions/workflows/tests.yml)
 
-**A DVH builder for high-definition, HDSS-like structures**, with particular
-attention to small SRS targets. It offers two explicit evaluation methods in
-physical coordinates; neither requires reducing the structure to CT slices.
+**A reusable 3D DVH builder for HDSS-derived and other high-definition structures.**
 
-**HDSS carries detailed structure information. It does not define how a DVH is
-calculated.** A DVH also depends on the dose grid, the reconstructed boundary and
-which volume is counted. Two programs can therefore read the same structure
-information and still show different DVHs.
+## The problem
 
-| Method | How it calculates the DVH | Purpose |
-|---|---|---|
-| **Full-volume integration** — `calculate` / `converge` | Subdivide the represented body, evaluate dose throughout it, and accumulate positive physical volume weights. | Common fixed-dose transfer comparison, with numerical refinement checks. |
-| **Surface + dose-grid points** — `calculate_grid_centres` | Reconstruct or supply a surface; count only existing interior dose-grid centres, each with a complete dose-cell volume. | Investigate discrete native TPS readouts; boundary cells are not fractionally weighted. |
+A tiny SRS target may span only a few CT slices. Evaluating those sections alone
+can give boundary regions the wrong weight in the DVH, even when the dose has
+not changed. Finer structure information is useful only if the DVH calculation
+also uses it.
 
-The surface/grid method is **closer to the native TPS in this benchmark**. It is
-not established as a more accurate full-volume calculation. Its sampled volume
-can differ from the source or mesh volume. For a fair transfer comparison, keep
-the dose, geometry interpretation and evaluation rule fixed.
+## Our approach
 
-## Why this matters for small structures
+Keep the fine source geometry and dose in the same physical coordinates. Recover
+an explicit 3D surface from the HDSS-derived source, then evaluate the fine
+dose-grid points inside it. This retains information between CT planes instead
+of reducing the target to a few coarse sections. The source TPS in this benchmark
+also retains fine target geometry and local dose grids.
 
-A 6.5-mm³ sphere is only about **2.32 mm across**. With 1-mm sections, a few
-cross-sections can dominate the readout. Their position can change which boundary
-regions contribute; in a steep SRS dose gradient, this can change coverage metrics
-such as D98 even at unchanged physical dose.
+The figure compares both readouts using **the same HDSS surface and the same fine
+input dose**. Across all 24 original GTVs, the mean absolute D98 difference from
+the source TPS decreases from **0.601 Gy with coarse 1-mm plane-only evaluation
+to 0.234 Gy with the 3D HDSS method**. Mean-dose differences decrease from
+**0.309 to 0.096 Gy**. Agreement improves overall; residual differences remain.
 
-Full-volume integration samples through the represented volume; `converge`
-checks stability under refinement. This addresses a coarse plane-only evaluation;
-**a properly refined slice-by-slice integrator can also be accurate**. For larger
-targets and gentle gradients the difference may be small. Fine integration does
-not restore detail already missing from the supplied structure or dose grid.
+![Same HDSS geometry and fine dose: coarse plane evaluation versus 3D HDSS evaluation](docs/hdss_sampling_comparison.png)
 
-[How both methods work, with a schematic and a small-versus-large example](docs/dvh_explained.md).
+This is a reusable calculation method, not a dependency on a proprietary TPS.
+The core accepts physical-space geometry and dose arrays; a DICOM reader supplies
+the source-plane interpretation. The [illustrated explanation](docs/dvh_explained.md)
+shows how the geometry, dose samples and volume weights become a DVH.
 
-![Surface/grid method: HDSS source preservation and separate native TPS agreement](docs/hdss_forward_validation.png)
+## Why small targets benefit most
 
-The figure shows **Surface + dose-grid points**. All 120 original/recovered-HDSS
-pairs agree exactly under this method. Native TPS agreement is a different test:
-**6/154 complete GTV histograms** match. The earlier **2/24** result refers to
-the original GTV-only subset; the 154 readouts span seven plans of the same 24
-synthetic target designs. [All-target results and runnable example](docs/surface_grid.md).
+A 6.5-mm³ sphere is about **2.32 mm across**. A few sections therefore have much
+more relative influence than they do in a large target. A steep dose gradient
+near the boundary can magnify the effect on D98. For larger targets and gentle
+gradients the improvement may be small. A properly refined slice-based integrator
+can also be accurate; our measured comparison is with the stated coarse
+plane-only method, not every algorithm that processes slices.
 
-Numerical accuracy is tested against known mathematical dose fields and finer
-integration for each declared body model. Agreement with a native TPS is checked
-separately. [Measured preservation and native-agreement evidence](docs/forward_validation.md).
+The package also provides **weighted full-volume integration** with refinement
+checks for controlled transfer studies and mathematical validation. Its volume
+weights differ from the discrete surface/grid readout. Neither method can restore
+shape or dose detail already missing from its input.
+[Calculation details](docs/methods.md) · [Surface/grid API](docs/surface_grid.md)
 
 ## Install and run
 
@@ -121,6 +120,9 @@ The largest curve error on the benchmark's stated plotting thresholds is
 **0.157 percentage points**. These are results for those test fields, not a
 universal accuracy guarantee. [Results and scope](docs/validation.md).
 
+<details>
+<summary>Methods appendix: mathematical accuracy and dose-grid effects</summary>
+
 ![Independent mathematical accuracy test](docs/analytical_srs_dvh.png)
 
 *Separate analytic validation: a known 6.5-mm³ sphere in a deliberately steep
@@ -134,6 +136,8 @@ python examples/analytical_benchmark.py --output-dir results/analytical
 This example separates **volume sampling** from **input dose-grid sampling**.
 It exports a figure and machine-readable results showing what can otherwise be
 lost. All inputs are mathematical objects; no patient data or TPS access is needed.
+
+</details>
 
 `converge` requires **two consecutive refinements** to satisfy dose-metric,
 volume and curve tolerances. The curve comparison uses the exact maximum

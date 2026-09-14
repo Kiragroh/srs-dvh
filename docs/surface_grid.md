@@ -54,8 +54,8 @@ evaluation grids; it is not an automatic fallback.
 - All **154 individually stored GTV readouts** across seven plans were checked,
   plus **144 PTV readouts**. These reuse 24 synthetic target geometries; they are
   not 154 independent lesions or patients.
-- The surface/grid method reproduces **6/154 complete GTV histograms** exactly.
-  The remaining native boundary/readout differences must remain visible.
+- The method improves native agreement in the measured coarse-plane comparison.
+  Remaining native boundary/readout differences stay visible.
 - All **120 original-versus-recovered-HDSS pairs** produce exactly the same
   surface/grid curves and checked dose metrics. The method can therefore be
   applied to these recovered HDSS source bodies without losing the source result.
