@@ -2,117 +2,80 @@
 
 [![Tests](https://github.com/Kiragroh/srs-dvh/actions/workflows/tests.yml/badge.svg)](https://github.com/Kiragroh/srs-dvh/actions/workflows/tests.yml)
 
-**A reusable 3D DVH builder for HDSS-derived and other high-definition structures.**
+**A 3D DVH builder for HDSS-derived and other high-definition structures.**
 
-## The problem
+## Why HDSS support matters
 
-A tiny SRS target may span only a few CT slices. Evaluating those sections alone
-can give boundary regions the wrong weight in the DVH, even when the dose has
-not changed. Finer structure information is useful only if the DVH calculation
-also uses it.
+A tiny SRS target may span only two or three CT sections. Reducing its fine shape
+to those sections can change the target even when the dose is unchanged. A
+receiving system may import the contours correctly and still evaluate a different
+body from the original. Replanning on that body can conceal the discrepancy.
 
-## Our approach
+**HDSS addresses an information-loss problem. Its benefit must survive both
+structure handling and dose evaluation.** A successful import, a High import
+option, or a smooth DVH does not by itself establish that preservation.
 
-**Preserve the 3D structure, then integrate dose throughout its volume.** Keep
-the geometry and dose in the same physical coordinates. Divide the represented
-body into small volume contributions, interpolate the available dose at each
-contribution, and sum their volume weights. Refining the integration checks
-whether the answer is stable. It does not require the integration points to lie
-on CT slices.
+## How we use the extra information
 
-![How coarse planes and fine volume integration represent a small target](docs/sampling_explained.svg)
+Keep geometry and dose in physical coordinates. Reconstruct the complete 3D
+boundary, divide its volume into small contributions, interpolate the available
+dose at each contribution, and sum their volume weights. This includes the target
+between CT planes and its boundary. Refinement checks numerical stability.
 
-Why this matters: a 6.5-mm³ sphere is only **2.32 mm across**. A few coarse
-sections can give its boundary the wrong weight. Fine integration includes the
-volume between those planes. The benefit is largest when targets are small or
-thin and dose changes rapidly near the boundary. A properly reconstructed and
-refined slice-based integrator can also be accurate; merely looping over slices
-is not the problem.
+![Coarse sections and complete-volume evaluation](docs/sampling_explained.svg)
 
-## Check native TPS output separately
+A well-reconstructed and sufficiently refined slice-based method can also be
+accurate. The issue is coarse or missing geometry and boundary weighting, not
+whether the software loops over slices. Interpolating ordinary contours cannot
+uniquely restore a source shape that has already been discarded.
 
-To show what a planning system actually displays, use its **native DVH export**:
-first replot all curves, preserve repeated dose coordinates and steps, check the
-screenshot, then match individual targets by ROI identity. A complete import
-route can change geometry, dose representation and the native evaluator at once.
-An independently computed curve must not be labelled as that TPS's result.
+## Accuracy against a known answer
 
-The exports are also **validation targets for computational hypotheses**. On a
-synthetic SRS benchmark, discrete dose values with fractional ROI weights explain
-RayStation's steps; shape reconstruction plus dose interpolation comes much closer
-to Eclipse's smooth curves. Those mechanisms were tested on DICOM inputs without
-fitting curve shifts or dose scales. They are distinct from our common 3D evaluator.
-[Native results, tested mechanisms and remaining differences](docs/tps_method_hypotheses.md).
+![Same exact shape and dose: plane-only versus complete 3D integration](docs/sampling_accuracy.png)
 
-Our same-fine-dose check does **not** establish closer native-TPS emulation:
-the plane-based readout has the smaller mean D98 gap in all five target groups.
-HDSS preserves more geometry, but agreement with a proprietary DVH is a separate
-question. The builder's purpose is a consistent evaluation of a stated 3D body,
-with numerical refinement checks—not fitting a native curve.
+Both methods use **the same exact continuous dose and shape**. Only volume
+sampling changes. Across four predefined analytical cases, plane-only sampling
+on 1-mm sections gives maximum DVH volume-axis errors of **3.24–14.07 percentage
+points**. Complete 3D integration at 0.025 mm gives **0.006–0.157 points**. The
+figure shows the small sphere at the second prescribed grid position and the
+larger tilted ellipsoid; all four cases remain in the data.
 
-<details>
-<summary>Independent-method comparison against the native reference</summary>
+This demonstrates volume-integration accuracy under controlled inputs, not a
+ranking of TPS vendors. Finer integration cannot recover missing dose detail.
+Reproduce the measurements with [analytical_benchmark.py](examples/analytical_benchmark.py)
+and the figure with [plot_sampling_accuracy.py](examples/plot_sampling_accuracy.py).
 
-The solid curves below are the **native TPS DVHs before any export**. The dashed
-curves show two independent workflows for the same twelve synthetic targets:
+## Preserve the target through the complete route
 
-- **Left:** ordinary CT-plane contours, evaluated on the supplied planes with
-  fine in-plane sampling and complete plane-volume weights.
-- **Right:** geometry recovered from HDSS and fine source dose, evaluated
-  throughout the reconstructed 3D volume at 0.05-mm spacing.
+Use **unchanged dose and the same evaluator** for original and transferred
+geometry. Across 120 source-to-HDSS checks, decoding the source grid recovered
+the original binary structures. D98 and integrated volume were identical; the
+largest plotted curve difference was 0.00011 percentage points. Both inputs used
+the same unsmoothed level-0.5 boundary. This is source preservation, not a promise
+of identical native TPS DVHs or zero error in every importer.
 
-**Both panels use the same fine source dose.** Dose-grid spacing is not the
-spacing used to sample the target volume.
+[Paired preservation example](docs/complete_3d_comparison.png) ·
+[Measured results and limits](docs/forward_validation.md)
 
-![Native TPS before export versus ordinary DICOM and complete 3D HDSS workflows](docs/native_workflow_comparison.png)
+For replanning, evaluate the **same new dose on both the planning target and the
+original target**. That exposes changes hidden by evaluating only the imported
+structure. New-versus-old optimisation is a separate comparison.
 
-The right-hand workflow uses source-geometry information that ordinary contours
-no longer contain. Ordinary contours can also be interpolated between planes,
-but that estimates a missing shape; it does not uniquely restore the original.
-In this same-dose comparison, the plane readout has a smaller mean D98 gap from
-the native TPS in each target group. **Full-volume integration is not a claim
-of closer TPS emulation.** It evaluates a stated 3D body consistently; boundary
-weighting remains a source of disagreement. Geometry preservation and native
-DVH agreement are different tests. [Measured agreement and limits](docs/forward_validation.md).
+## Understand the TPS observations
 
-The ordinary-DICOM comparison also deserves careful sampling. We tested
-dicompyler-core 0.5.6 defaults and four refinement settings across all 120
-target/plan states. An analytical ramp exposed a coordinate mismatch in its
-optional resampling, so that option is shown as a diagnostic, not as evidence
-for an HDSS benefit. The main plane readout interpolates the same fine dose used
-by the complete-3D readout at the actual physical coordinates. Separate diagnostic
-curves use regular exported dose and therefore change the input dose too.
-[Options and reproducible audit](docs/dicompyler_fairness.md).
+Native DVH exports and screenshots establish what a TPS actually displays.
+DICOM-based models then investigate why: dose-voxel values with fractional
+volume weights explain one stepped readout; shape reconstruction and interpolated
+dose better explain another smooth readout. These are tested hypotheses, not
+identified proprietary algorithms or production TPS-emulation modes.
 
-</details>
+Matching a native curve and accurately evaluating a known 3D body are different
+tests. Our full-volume calculation does not always lie closest to a native TPS
+curve. Boundary conventions and the available dose field still matter.
+[Native evidence, models and residuals](docs/tps_method_hypotheses.md).
 
-## Then isolate what the structure transfer changes
-
-Keep **the dose and evaluator identical** for original and transferred geometry.
-Now a changed DVH reflects a changed represented target, rather than a different
-dose field or another TPS's evaluator. This is the comparison the builder enables.
-
-<details>
-<summary>Source preservation check: why the original and decoded HDSS can overlap exactly</summary>
-
-![Same dose and evaluator: recovered HDSS versus ordinary CT-plane contours](docs/complete_3d_comparison.png)
-
-Across 120 GTV/PTV source–HDSS pairs, D98 and integrated volume are identical;
-the largest plotted curve difference is **0.00011 percentage points**. Decoding
-the HDSS source grid recovers the original binary geometry in this dataset.
-Both use the same unsmoothed level-0.5 surface. Simply treating the exported
-contours as slabs gives a different body and can give nonzero volume/Dice differences.
-Exact source recovery is therefore compatible with those differences, and is
-not a claim of exact native-TPS DVH agreement.
-
-</details>
-
-For replanning, calculate a new plan with the same template and evaluate its dose
-on **both the original and reimported targets**. New optimisation adds variability;
-it must be distinguished from the unchanged-dose geometry comparison.
-
-Neither fine integration nor HDSS can restore information already lost from the input.
-[Illustrated explanation](docs/dvh_explained.md) · [Calculation details](docs/methods.md)
+[Calculation explained](docs/dvh_explained.md) · [Methods](docs/methods.md) ·
+[Validation](docs/validation.md) · [Fair dicompyler-core checks](docs/dicompyler_fairness.md)
 
 ## Install and run
 
@@ -187,24 +150,9 @@ The largest curve error on the benchmark's stated plotting thresholds is
 **0.157 percentage points**. These are results for those test fields, not a
 universal accuracy guarantee. [Results and scope](docs/validation.md).
 
-<details>
-<summary>Methods appendix: mathematical accuracy and dose-grid effects</summary>
+The same script also tests input dose-grid spacing separately. That is a different
+source of error from volume integration. [Dose-grid sensitivity](docs/analytical_srs_dvh.png).
 
-![Independent mathematical accuracy test](docs/analytical_srs_dvh.png)
-
-*Separate analytic validation: a known 6.5-mm³ sphere in a deliberately steep
-dose field. The exact reference is mathematical. These curves do not stand in
-for the actual benchmark's native-TPS comparison.*
-
-```sh
-python examples/analytical_benchmark.py --output-dir results/analytical
-```
-
-This example separates **volume sampling** from **input dose-grid sampling**.
-It exports a figure and machine-readable results showing what can otherwise be
-lost. All inputs are mathematical objects; no patient data or TPS access is needed.
-
-</details>
 
 `converge` requires **two consecutive refinements** to satisfy dose-metric,
 volume and curve tolerances. The curve comparison uses the exact maximum

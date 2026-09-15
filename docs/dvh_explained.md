@@ -44,37 +44,23 @@ The [paired example](complete_3d_comparison.png) shows source preservation under
 that stated model. Replanning is a separate experiment: evaluate the new dose
 on both the original and returned geometries.
 
-The [native-TPS comparison](native_workflow_comparison.png) uses solid native
-curves before export and dashed independent readouts. The full 3D workflow keeps
-fine source information, but does not exactly reproduce the TPS or improve every
-scalar. It can count boundary volume differently. Use the native curve as a
-comparison, and unchanged dose plus one method to isolate the transfer effect.
+## Accuracy and TPS behaviour answer different questions
 
-## Native TPS evidence and model checks are different
+The [known-answer example](sampling_accuracy.png) holds exact shape and dose fixed.
+It shows the smaller volume-sampling error of complete 3D integration, especially
+for the 6.5-mm³ target. No native curve is fitted. The corresponding
+[analytical benchmark](../examples/analytical_benchmark.py) includes four prescribed
+shape/position cases and separate dose-grid sensitivity tests.
 
-An actual TPS comparison starts with native exported DVH points, matched ROI
-names and a check that the complete replot reproduces the TPS view. Preserve
-vertical jumps and do not smooth, shift or scale curves to make them agree.
-A whole import route includes several effects; common-dose/common-evaluator
-pairs isolate the changed represented geometry.
+Native DVH exports answer what the TPS shows after transfer. Keep their points
+and steps, match targets, and verify the complete replot against the screenshot.
+Then test fixed reconstruction, partial-volume and dose-interpolation rules on
+the DICOM data. [Tested TPS mechanisms](tps_method_hypotheses.md) explain much of
+the observed behaviour without establishing the exact internal implementation.
 
-In the present independent-method check, the plane-based readout is closer to
-the native D98 on average in every target group. This does not demonstrate that
-less geometry information is better, or that full-volume integration is a TPS
-emulator. The stated boundary model and available dose still matter.
-
-## Use the native curves to test an explanation
-
-Do not stop at replotting the exports. Hold DICOM dose and coordinates fixed,
-then test explicit choices for boundary reconstruction, partial-volume weights
-and dose interpolation. Native curves and screenshots tell us whether those
-choices reproduce the observed behaviour. For tiny targets, a few differently
-weighted boundary contributions can move an entire curve.
-
-[The TPS-method check](tps_method_hypotheses.md) illustrates this distinction:
-one native view is explained by discrete dose values and fractional weights,
-another by reconstructed shape and interpolated dose. Matching these views is a
-separate task from preserving HDSS geometry under one common evaluator.
+Our full-volume calculation does not match every native scalar better than a
+plane-based readout. Its value is preserving and consistently evaluating the
+stated 3D geometry. [Full agreement results](forward_validation.md).
 
 ## What is meant by “slice by slice”
 
