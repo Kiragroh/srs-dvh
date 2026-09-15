@@ -37,6 +37,13 @@ screenshot, then match individual targets by ROI identity. A complete import
 route can change geometry, dose representation and the native evaluator at once.
 An independently computed curve must not be labelled as that TPS's result.
 
+The exports are also **validation targets for computational hypotheses**. On a
+synthetic SRS benchmark, discrete dose values with fractional ROI weights explain
+RayStation's steps; shape reconstruction plus dose interpolation comes much closer
+to Eclipse's smooth curves. Those mechanisms were tested on DICOM inputs without
+fitting curve shifts or dose scales. They are distinct from our common 3D evaluator.
+[Native results, tested mechanisms and remaining differences](docs/tps_method_hypotheses.md).
+
 Our same-fine-dose check does **not** establish closer native-TPS emulation:
 the plane-based readout has the smaller mean D98 gap in all five target groups.
 HDSS preserves more geometry, but agreement with a proprietary DVH is a separate

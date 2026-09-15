@@ -63,6 +63,19 @@ the native D98 on average in every target group. This does not demonstrate that
 less geometry information is better, or that full-volume integration is a TPS
 emulator. The stated boundary model and available dose still matter.
 
+## Use the native curves to test an explanation
+
+Do not stop at replotting the exports. Hold DICOM dose and coordinates fixed,
+then test explicit choices for boundary reconstruction, partial-volume weights
+and dose interpolation. Native curves and screenshots tell us whether those
+choices reproduce the observed behaviour. For tiny targets, a few differently
+weighted boundary contributions can move an entire curve.
+
+[The TPS-method check](tps_method_hypotheses.md) illustrates this distinction:
+one native view is explained by discrete dose values and fractional weights,
+another by reconstructed shape and interpolated dose. Matching these views is a
+separate task from preserving HDSS geometry under one common evaluator.
+
 ## What is meant by “slice by slice”
 
 Coarse plane-only evaluation is limited by its spacing in depth. A method which
