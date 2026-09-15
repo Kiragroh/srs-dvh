@@ -29,7 +29,22 @@ thin and dose changes rapidly near the boundary. A properly reconstructed and
 refined slice-based integrator can also be accurate; merely looping over slices
 is not the problem.
 
-## First compare with the native TPS
+## Check native TPS output separately
+
+To show what a planning system actually displays, use its **native DVH export**:
+first replot all curves, preserve repeated dose coordinates and steps, check the
+screenshot, then match individual targets by ROI identity. A complete import
+route can change geometry, dose representation and the native evaluator at once.
+An independently computed curve must not be labelled as that TPS's result.
+
+Our same-fine-dose check does **not** establish closer native-TPS emulation:
+the plane-based readout has the smaller mean D98 gap in all five target groups.
+HDSS preserves more geometry, but agreement with a proprietary DVH is a separate
+question. The builder's purpose is a consistent evaluation of a stated 3D body,
+with numerical refinement checks—not fitting a native curve.
+
+<details>
+<summary>Independent-method comparison against the native reference</summary>
 
 The solid curves below are the **native TPS DVHs before any export**. The dashed
 curves show two independent workflows for the same twelve synthetic targets:
@@ -61,6 +76,8 @@ for an HDSS benefit. The main plane readout interpolates the same fine dose used
 by the complete-3D readout at the actual physical coordinates. Separate diagnostic
 curves use regular exported dose and therefore change the input dose too.
 [Options and reproducible audit](docs/dicompyler_fairness.md).
+
+</details>
 
 ## Then isolate what the structure transfer changes
 

@@ -50,6 +50,19 @@ fine source information, but does not exactly reproduce the TPS or improve every
 scalar. It can count boundary volume differently. Use the native curve as a
 comparison, and unchanged dose plus one method to isolate the transfer effect.
 
+## Native TPS evidence and model checks are different
+
+An actual TPS comparison starts with native exported DVH points, matched ROI
+names and a check that the complete replot reproduces the TPS view. Preserve
+vertical jumps and do not smooth, shift or scale curves to make them agree.
+A whole import route includes several effects; common-dose/common-evaluator
+pairs isolate the changed represented geometry.
+
+In the present independent-method check, the plane-based readout is closer to
+the native D98 on average in every target group. This does not demonstrate that
+less geometry information is better, or that full-volume integration is a TPS
+emulator. The stated boundary model and available dose still matter.
+
 ## What is meant by “slice by slice”
 
 Coarse plane-only evaluation is limited by its spacing in depth. A method which
