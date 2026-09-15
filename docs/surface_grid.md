@@ -1,17 +1,30 @@
-# Surface and dose-grid-centre DVHs
+# An additional option: select dose samples with the fine 3D boundary
 
-> Diagnostic option. The current primary workflow is complete-volume integration; see [source preservation and numerical checks](forward_validation.md). Closer agreement with a stored TPS curve does not establish full-volume accuracy.
+Recover the high-definition surface and ask which dose-grid centres lie inside
+it. Each selected point contributes its stored dose and one dose-cell volume.
+This uses the target throughout its depth, independently of CT planes. It is a
+practical alternative for investigating a discrete native DVH readout.
 
-[Start with the illustrated explanation of both methods](dvh_explained.md).
+![Defined alternative readout and all-target native agreement](boundary_grid_option.png)
 
-Version 0.2 adds a selectable surface/grid method alongside full-volume
-integration. It is useful when investigating a TPS that evaluates a reconstructed
-surface at discrete dose points. It is **not a verified copy of a native TPS
-algorithm** and does not automatically replace full-volume integration.
+The left example shows GTV09; the right includes **all 24 GTV-only targets**.
+Both calculations use the same recovered HDSS surface and fine native dose field.
+Mean absolute D98 differences from the native TPS are **0.601 ± 0.511 Gy** for
+CT-plane sampling and **0.234 ± 0.254 Gy** for the proposed selection rule
+(mean ± sample SD). The largest residual is **0.958 Gy**. Curves join the stored
+0.2-Gy histogram bins; scalar metrics use unbinned samples.
 
-“Closer to the native TPS” describes the measured benchmark agreement. It does
-not establish greater numerical accuracy for the complete target volume or an
-automatic advantage over a sufficiently refined slice-based integrator.
+The algorithm changes depth sampling and dose sampling together. It is not a
+measurement of HDSS export loss or proof of full-volume accuracy. The example
+uses fine native dose fields; equally close agreement is not established for
+coarser ordinary exported dose. [Reproduce this figure](../examples/plot_boundary_grid_option.py).
+
+The primary transfer comparison continues to use complete-volume integration.
+This additional option is available when the stated sampling convention matches
+the question. [Both methods explained](dvh_explained.md) ·
+[Source preservation and numerical checks](forward_validation.md).
+
+## Implementation
 
 ```bash
 python -m pip install -e ".[surfaces]"

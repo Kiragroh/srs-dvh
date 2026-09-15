@@ -61,6 +61,18 @@ For replanning, evaluate the **same new dose on both the planning target and the
 original target**. That exposes changes hidden by evaluating only the imported
 structure. New-versus-old optimisation is a separate comparison.
 
+## An additional option for approaching native DVH readouts
+
+Use the fine 3D boundary to select dose-grid centres, then count each selected
+point with one dose-cell volume. In a fixed comparison of all 24 GTV-only targets,
+the mean absolute D98 gap from the native TPS was **0.234 ± 0.254 Gy**, compared
+with **0.601 ± 0.511 Gy** using CT planes (mean ± sample SD). The largest residual
+was **0.958 Gy**. Both methods used the same recovered HDSS surface and fine dose.
+
+This is an alternative algorithm, not a software-product label or a complete
+TPS emulation. It counts boundary cells differently from full-volume integration.
+[How it works, the comparison figure and executable example](docs/surface_grid.md).
+
 ## Understand the TPS observations
 
 Native DVH exports and screenshots establish what a TPS actually displays.

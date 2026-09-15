@@ -44,6 +44,14 @@ The [paired example](complete_3d_comparison.png) shows source preservation under
 that stated model. Replanning is a separate experiment: evaluate the new dose
 on both the original and returned geometries.
 
+## An additional way to count the fine target
+
+A discrete alternative selects dose-grid centres inside the same fine 3D
+boundary and counts each with one dose-cell volume. This can approach a native
+TPS readout while retaining the HDSS boundary. Unlike full-volume integration,
+it does not fractionally weight the boundary cells. [Algorithm and measured
+agreement for all 24 GTVs](surface_grid.md).
+
 ## Accuracy and TPS behaviour answer different questions
 
 The [known-answer example](sampling_accuracy.png) holds exact shape and dose fixed.
