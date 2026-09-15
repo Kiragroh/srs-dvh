@@ -6,8 +6,9 @@ the computation.
 
 The following check uses one public-anatomy, synthetic SRS benchmark: 24 GTVs
 and 24 PTVs in its 1-mm-margin plan. RayStation 2024B receives ordinary
-CT-plane contours; Eclipse 18 receives HDSS with High import. Their respective
-ordinary reexported contours supply the model geometry. In each model test,
+CT-plane contours; Eclipse 18 receives HDSS with High import. The RayStation
+model uses the supplied ordinary RTSTRUCT; the Eclipse model uses its ordinary
+contour reexport. In each model test,
 dose values and physical coordinates are fixed. No shifts, dose scales or
 target-specific parameters are fitted.
 
