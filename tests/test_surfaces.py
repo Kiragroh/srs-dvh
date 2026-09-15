@@ -86,3 +86,17 @@ def test_nested_shell_keeps_the_cavity_empty():
     integrated=calculate(shell,dose,.1)
     assert integrated.volume_mm3==pytest.approx(7)
     assert integrated.metrics()['Dmean_Gy']==pytest.approx(1)
+
+
+def test_surface_quadrature_is_stable_at_integer_step_boundaries():
+    SurfaceROI,_=api();vertices,faces=cube()
+    # Identical geometry after a typical round-trip decimal serialization.
+    v=vertices*3.8+np.array([-18.74100189209,12.582713317871,-425.3])
+    a=SurfaceROI(v,faces)
+    b=SurfaceROI(v+np.where(v==v.min(0),4e-13,0),faces)
+    pa,wa=zip(*a.quadrature(.1));pb,wb=zip(*b.quadrature(.1))
+    pa,wa=np.concatenate(pa),np.concatenate(wa)
+    pb,wb=np.concatenate(pb),np.concatenate(wb)
+    assert pa.shape==pb.shape
+    assert np.allclose(pa,pb,rtol=0,atol=1e-9)
+    assert np.allclose(wa,wb,rtol=0,atol=1e-12)

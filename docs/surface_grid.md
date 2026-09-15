@@ -1,5 +1,7 @@
 # Surface and dose-grid-centre DVHs
 
+> Diagnostic option. The current primary workflow is complete-volume integration; see [source preservation and numerical checks](forward_validation.md). Closer agreement with a stored TPS curve does not establish full-volume accuracy.
+
 [Start with the illustrated explanation of both methods](dvh_explained.md).
 
 Version 0.2 adds a selectable surface/grid method alongside full-volume

@@ -46,7 +46,7 @@ a typical effect size or a finding about a particular TPS**.
 
 ## Regression tests
 
-The 25 collected tests include 18 core/contour tests covering sphere volumes, a spherical-cap DVH in a linear
+The 26 collected tests include 18 core/contour tests covering sphere volumes, a spherical-cap DVH in a linear
 field, oblique and anisotropic coordinates, occupied voxel volume, out-of-dose
 rejection, refinement evidence, binary-mask validation, unequal weights, low-dose
 curves, and a 50-percentage-point difference inside a 0.001-Gy interval invisible
@@ -57,10 +57,11 @@ interior sampling points for clipped cells and an oblique annulus in a known
 quadratic field. The last case rejects coarse approximations and checks two
 final metric refinements.
 
-Seven surface tests additionally check a known cube, an oblique affine, the
+Eight surface tests additionally check a known cube, an oblique affine, the
 single-voxel isosurface, open-surface rejection, empty grid support, explicitly
 partial dose-grid coverage and a nested cavity in both signed-distance and
-continuous-volume evaluation.
+continuous-volume evaluation, and stability under sub-picometre coordinate noise
+at an integer sampling boundary.
 
 ## Scope
 

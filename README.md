@@ -13,39 +13,48 @@ also uses it.
 
 ## Our approach
 
-Keep the fine source geometry and dose in the same physical coordinates. Recover
-an explicit 3D surface from the HDSS-derived source, then evaluate the fine
-dose-grid points inside it. This retains information between CT planes instead
-of reducing the target to a few coarse sections. The source TPS in this benchmark
-also retains fine target geometry and local dose grids.
+**Preserve the 3D structure, then integrate dose throughout its volume.** Keep
+the geometry and dose in the same physical coordinates. Divide the represented
+body into small volume contributions, interpolate the available dose at each
+contribution, and sum their volume weights. Refining the integration checks
+whether the answer is stable. It does not require the integration points to lie
+on CT slices.
 
-The figure compares both readouts using **the same HDSS surface and the same fine
-input dose**. Across all 24 original GTVs, the mean absolute D98 difference from
-the source TPS decreases from **0.601 Gy with coarse 1-mm plane-only evaluation
-to 0.234 Gy with the 3D HDSS method**. Mean-dose differences decrease from
-**0.309 to 0.096 Gy**. Agreement improves overall; residual differences remain.
+![How coarse planes and fine volume integration represent a small target](docs/sampling_explained.svg)
 
-![Same HDSS geometry and fine dose: coarse plane evaluation versus 3D HDSS evaluation](docs/hdss_sampling_comparison.png)
+Why this matters: a 6.5-mm³ sphere is only **2.32 mm across**. A few coarse
+sections can give its boundary the wrong weight. Fine integration includes the
+volume between those planes. The benefit is largest when targets are small or
+thin and dose changes rapidly near the boundary. A properly reconstructed and
+refined slice-based integrator can also be accurate; merely looping over slices
+is not the problem.
 
-This is a reusable calculation method, not a dependency on a proprietary TPS.
-The core accepts physical-space geometry and dose arrays; a DICOM reader supplies
-the source-plane interpretation. The [illustrated explanation](docs/dvh_explained.md)
-shows how the geometry, dose samples and volume weights become a DVH.
+## What the benchmark establishes
 
-## Why small targets benefit most
+The figure keeps **the fine input dose and the complete 3D evaluator fixed**.
+Left: original source geometry and geometry recovered from HDSS overlap.
+Right: replacing that source with ordinary CT-plane contours changes the DVH.
+The difference is due to the supplied geometry under this reconstruction model.
 
-A 6.5-mm³ sphere is about **2.32 mm across**. A few sections therefore have much
-more relative influence than they do in a large target. A steep dose gradient
-near the boundary can magnify the effect on D98. For larger targets and gentle
-gradients the improvement may be small. A properly refined slice-based integrator
-can also be accurate; our measured comparison is with the stated coarse
-plane-only method, not every algorithm that processes slices.
+![Same dose and evaluator: HDSS retains the source readout; CT-plane contours can change it](docs/complete_3d_comparison.png)
 
-The package also provides **weighted full-volume integration** with refinement
-checks for controlled transfer studies and mathematical validation. Its volume
-weights differ from the discrete surface/grid readout. Neither method can restore
-shape or dose detail already missing from its input.
-[Calculation details](docs/methods.md) · [Surface/grid API](docs/surface_grid.md)
+Across 120 GTV/PTV source–HDSS pairs, D98 and integrated volume are identical;
+the largest plotted curve difference is **0.00011 percentage points**. The
+source/recovered masks use the same unsmoothed level-0.5 surface model. Ordinary
+contours use explicit polygon slabs. Those body definitions are stated, not
+silently treated as the same representation.
+
+**This is a geometry-preservation result, not a claim to reproduce a TPS.**
+The native TPS retains fine geometry and dose, but its boundary weights can
+differ. Our complete-volume method is not uniformly closer to its stored D98
+than an ordinary default DICOM readout. A favourable-looking DVH is not a
+validation criterion. [Evidence and limits](docs/forward_validation.md).
+
+The primary calculation is weighted complete-volume integration. The separate
+[dose-grid-centre option](docs/surface_grid.md) remains available for diagnostics;
+its whole-cell boundary weighting makes it sensitive to grid alignment.
+Neither method can recover geometry or dose detail missing from the input.
+[Illustrated explanation](docs/dvh_explained.md) · [Calculation details](docs/methods.md)
 
 ## Install and run
 
@@ -108,7 +117,7 @@ planes. See the [methods and input contract](docs/methods.md).
 
 ## Accuracy and examples
 
-The repository contains **25 tests** covering known spherical DVHs, oblique and
+The repository contains **26 tests** covering known spherical DVHs, oblique and
 anisotropic coordinates, unequal volume weights, holes, tiny contour caps,
 out-of-grid rejection and refinement checks, plus surface reconstruction,
 discrete grid sampling, nested cavities and explicit partial coverage.

@@ -65,15 +65,27 @@ class SurfaceROI:
         return np.array([self._distance.EvaluateFunction(p) for p in points])
 
     def quadrature(self, step_mm, max_points=250000):
-        """Full interior midpoint integration; independent of dose-grid centres."""
+        """Full interior midpoint integration; independent of dose-grid centres.
+
+        The stencil is evaluated in local coordinates rounded to 1e-8 mm to
+        suppress floating-point round-trip noise at triangle/sample boundaries.
+        This numerical tolerance does not smooth or alter the stored mesh.
+        """
         import vtk
-        from vtk.util.numpy_support import vtk_to_numpy
+        from vtk.util.numpy_support import vtk_to_numpy, numpy_to_vtk
         if not np.isfinite(step_mm) or step_mm<=0:raise ValueError('Positive integration spacing required')
-        lo=self.vertices.min(0);hi=self.vertices.max(0)
-        n=np.ceil((hi-lo)/step_mm).astype(int)
+        lo=self.vertices.min(0)
+        local_vertices=np.round(self.vertices-lo,8)
+        extent=local_vertices.max(0)
+        # Decimal DICOM coordinates can straddle an integer step count by a few
+        # ulps. Do not insert an entire extra integration plane for that noise.
+        n=np.ceil(extent/step_mm-1e-7).astype(int)
         if np.any(n<1) or np.prod(n,dtype=float)>100_000_000:raise ValueError('Surface integration grid is empty or too large')
-        spacing=(hi-lo)/n;origin=lo+spacing/2
-        stencil=vtk.vtkPolyDataToImageStencil();stencil.SetInputData(self.poly)
+        spacing=extent/n;origin=spacing/2
+        local_poly=vtk.vtkPolyData();local_poly.ShallowCopy(self.poly)
+        local_points=vtk.vtkPoints();local_points.SetData(numpy_to_vtk(local_vertices,deep=True))
+        local_poly.SetPoints(local_points)
+        stencil=vtk.vtkPolyDataToImageStencil();stencil.SetInputData(local_poly)
         stencil.SetOutputOrigin(*origin);stencil.SetOutputSpacing(*spacing)
         stencil.SetOutputWholeExtent(0,int(n[0])-1,0,int(n[1])-1,0,int(n[2])-1)
         stencil.SetTolerance(0);stencil.Update()
@@ -82,7 +94,7 @@ class SurfaceROI:
         mask=vtk_to_numpy(image.GetOutput().GetPointData().GetScalars()).reshape(tuple(n[::-1]))
         indices=np.argwhere(mask)[:,::-1];weight=float(np.prod(spacing))
         for start in range(0,len(indices),max_points):
-            points=indices[start:start+max_points]*spacing+origin
+            points=indices[start:start+max_points]*spacing+origin+lo
             yield points,np.full(len(points),weight)
 
 
