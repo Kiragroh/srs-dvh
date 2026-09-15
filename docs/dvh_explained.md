@@ -54,9 +54,15 @@ agreement for all 24 GTVs](surface_grid.md).
 
 ## Accuracy and TPS behaviour answer different questions
 
-The [known-answer example](sampling_accuracy.png) holds exact shape and dose fixed.
-It shows the smaller volume-sampling error of complete 3D integration, especially
-for the 6.5-mm³ target. No native curve is fitted. The corresponding
+The [PTV illustration](ptv_sampling.png) shows the geometry first: a 30-mm³ PTV
+occupies four 1-mm contour planes, while a 600-mm³ PTV occupies ten. Each slice
+therefore has more influence in the smaller target. These are idealised spheres,
+with both centres halfway between planes. The companion numerical checks use
+the same known shape and exact continuous dose for both sampling methods.
+Complete 3D integration follows the known reference closely; plane-only sampling
+has a larger effect on the small PTV. [Reproduce the illustration and checks](../examples/plot_ptv_sampling.py).
+
+No native curve is fitted. The separate
 [analytical benchmark](../examples/analytical_benchmark.py) includes four prescribed
 shape/position cases and separate dose-grid sensitivity tests.
 

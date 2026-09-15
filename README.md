@@ -31,19 +31,26 @@ uniquely restore a source shape that has already been discarded.
 
 ## Accuracy against a known answer
 
-![Same exact shape and dose: plane-only versus complete 3D integration](docs/sampling_accuracy.png)
+![Small and larger PTVs: contour planes and represented volume](docs/ptv_sampling.png)
 
-Both methods use **the same exact continuous dose and shape**. Only volume
-sampling changes. Across four predefined analytical cases, plane-only sampling
-on 1-mm sections gives maximum DVH volume-axis errors of **3.24–14.07 percentage
-points**. Complete 3D integration at 0.025 mm gives **0.006–0.157 points**. The
-figure shows the small sphere at the second prescribed grid position and the
-larger tilted ellipsoid; all four cases remain in the data.
+In a small PTV, each slice represents a larger fraction of the target. The figure
+shows **two idealised spherical PTVs at the same physical scale**: 30 mm³
+(3.86 mm diameter, four contour planes) and 600 mm³ (10.46 mm, ten planes).
+Orange shows the 1-mm sections and their assigned slice volumes; teal keeps the
+complete boundary. Both centres are halfway between planes.
+
+The illustration explains the geometry. Its companion numerical check uses
+**the same exact continuous dose and shape** for both sampling methods. The
+largest gap from the known answer at the tested dose thresholds is **6.52 vs
+0.32 percentage points** for the small PTV and **0.84 vs 0.06 points** for the
+larger PTV (plane-only vs complete 3D integration at 0.05 mm).
 
 This demonstrates volume-integration accuracy under controlled inputs, not a
 ranking of TPS vendors. Finer integration cannot recover missing dose detail.
-Reproduce the measurements with [analytical_benchmark.py](examples/analytical_benchmark.py)
-and the figure with [plot_sampling_accuracy.py](examples/plot_sampling_accuracy.py).
+Reproduce the data and figure with
+[plot_ptv_sampling.py --recalculate](examples/plot_ptv_sampling.py).
+The [additional analytical tests](docs/validation.md) retain the four original
+shape/position cases and separate dose-grid sensitivity checks.
 
 ## Preserve the target through the complete route
 
@@ -76,6 +83,18 @@ TPS emulation. It counts boundary cells differently from full-volume integration
 ## Understand the TPS observations
 
 Native DVH exports and screenshots establish what a TPS actually displays.
+These two matched PTVs come from the same public synthetic 1-mm-margin plan:
+
+![Two PTVs from actual native TPS exports, with coverage details](docs/native_ptv_examples.png)
+
+The small PTV02 illustrates the largest negative RayStation D98 gap in the set;
+PTV16 is the larger example already used in the matched-target comparison.
+All original points and repeated dose coordinates are retained. The insets
+enlarge the 90–100% coverage region. These observations combine the transfer
+route, available dose and native evaluator; they do not isolate a single cause.
+[Exact input curves and all 24 PTV metrics](examples/data/native_ptv_examples.json) ·
+[Reproduce the figure](examples/plot_native_ptv_examples.py).
+
 DICOM-based models then investigate why: dose-voxel values with fractional
 volume weights explain one stepped readout; shape reconstruction and interpolated
 dose better explain another smooth readout. These are tested hypotheses, not

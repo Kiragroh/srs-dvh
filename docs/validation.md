@@ -31,6 +31,34 @@ volume error <0.3%, and maximum curve error on those thresholds <0.35 percentage
 points. This threshold-grid comparison against analytical truth is distinct from
 the **exact empirical curve comparison** used by `converge`.
 
+## Small and larger PTV illustration
+
+The [PTV figure](ptv_sampling.png) uses two additional idealised spheres of
+30 and 600 mm³, both centred halfway between fixed 1-mm contour planes.
+The prescribed volumes approximate the ends of the public benchmark's PTV
+range; they are not cases selected for their DVH discrepancy.
+
+The figure shows full boundaries and plane-derived slabs in a central x–z
+section, at the same physical scale for both PTVs. The companion numerical
+check applies the exact dose law above, with complete-volume integration at
+0.05 mm and plane-only integration with in-plane spacing at most 0.025 mm.
+Each plane is weighted by a 1-mm slab.
+
+For an independent check of the plane calculation, a plane at distance `z`
+from the sphere centre has area `pi * max(R² - z², 0)`. Replacing `R²` with
+`R² * clip((28-d)/8, 0, 1)` gives the area receiving at least dose `d`.
+Summing these areas supplies a closed-form plane-only reference, separate
+from the full-sphere reference. The example verifies both numerical integrals
+against their respective exact answers; full-volume sampling improves from
+0.1 to 0.05 mm. It does not claim a general convergence proof from two steps.
+
+```sh
+python examples/plot_ptv_sampling.py --recalculate
+```
+
+All thresholds, curves, metrics and checks are saved in
+[ptv_sampling.json](../examples/data/ptv_sampling.json).
+
 ## What happens without adequate sampling?
 
 The same script separately evaluates:
