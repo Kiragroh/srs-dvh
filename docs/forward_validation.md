@@ -30,6 +30,31 @@ The boundary regression fails without this conditioning and passes with it.
 
 ## Native TPS comparison
 
+The main figure now holds fine dose fixed for both representations. Mean absolute
+gaps from the stored native D98, in Gy; all 24 targets in each row:
+
+| Plan / ROI | CT-plane readout, same fine dose | Complete 3D, same fine dose |
+|---|---:|---:|
+| 0-mm / GTV | 0.348 | 0.614 |
+| 1-mm / GTV | 0.144 | 0.247 |
+| 1-mm / PTV | 0.189 | 0.315 |
+| 2-mm / GTV | 0.073 | 0.088 |
+| 2-mm / PTV | 0.210 | 0.291 |
+
+The plane readout is closer to native D98 on average in every group. This does
+not identify an analytical ground truth for a clinical boundary. The complete
+volume method evaluates the declared 3D model consistently; it is not a native
+TPS emulator. Its geometry-preservation comparison is distinct from native
+agreement. Refining plane integration from 0.125 to 0.0625 mm changes D98 by
+at most 0.108 Gy (95th percentile 0.052 Gy).
+
+<details>
+<summary>Additional diagnostic: unmodified library defaults and regular exported dose</summary>
+
+The table below retains the **unmodified-default diagnostic**, not the
+coordinate-consistent plane method in the main workflow figure. Optional library
+refinement and its coordinate audit are described in [the fairness check](dicompyler_fairness.md).
+
 The complete-volume result is **not uniformly closer to native TPS D98** than
 the actual default ordinary-DICOM histogram readout. Paired mean absolute gaps
 from the stored native scalar, in Gy:
@@ -50,6 +75,8 @@ Default-library D98 lookup can return zero on a cumulative-volume plateau even
 when its histogram is nonzero. The table uses the lower weighted quantile of
 that original histogram, not that API lookup artifact. No missing DVH is filled
 with zero. A default library result is not evidence of a commercial TPS algorithm.
+
+</details>
 
 ## Reproduce the public figures
 

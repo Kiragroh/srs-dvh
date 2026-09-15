@@ -1,0 +1,18 @@
+{
+  "field": "10 + x + 2*y Gy, exact linear ramp on 1-mm source centres",
+  "package_version": "0.5.6",
+  "crop_indices": [
+    2,
+    2,
+    9,
+    9
+  ],
+  "requested_spacing_mm": 0.125,
+  "reported_LUT_spacing_mm": 0.12727272727272743,
+  "interpolated_dose_minus_exact_at_reported_LUT": {
+    "mean_Gy": -1.499999999999999,
+    "max_abs_Gy": 1.6329545454545453
+  },
+  "direct_coordinate_interpolation_max_error_Gy": 7.105427357601002e-15,
+  "interpretation": "Optional resampling pairs a linspace through the excluded endpoint with image rescaling of the cropped array. These sampling conventions differ. This is a library-option diagnostic, not an HDSS effect or evidence about a commercial TPS."
+}

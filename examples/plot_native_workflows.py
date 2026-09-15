@@ -21,23 +21,25 @@ def main():
     missing=[]
     for r,color in zip(rows,COLORS):
         for ax in axes:ax.plot(r['native_dose_Gy'],r['native_pct'],color=color,lw=1.6)
-        if r['default_pct']:
-            axes[0].plot(data['default_dose_Gy'],r['default_pct'],color=color,lw=1.45,ls='--')
+        if r['fineplane_pct']:
+            axes[0].plot(data['default_dose_Gy'],r['fineplane_pct'],color=color,lw=1.45,ls='--')
         else:missing.append(r['target'])
         axes[1].plot(data['dose_Gy'],r['hdss_pct'],color=color,lw=1.45,ls='--')
     for ax in axes:
         ax.set(xlim=(15,30),ylim=(0,102),xlabel='Dose [Gy]')
         ax.grid(alpha=.14);ax.spines[['top','right']].set_visible(False)
     axes[0].set_ylabel('GTV volume [%]')
-    axes[0].set_title('Ordinary DICOM workflow\nCT-plane contours + 1-mm dose · dicompyler-core defaults',loc='left',fontsize=12)
-    axes[1].set_title('Our complete 3D workflow\nRecovered HDSS geometry + fine dose · volume integration',loc='left',fontsize=12)
+    axes[0].set_title('CT-plane contours\nDose sampled on the supplied contour planes',loc='left',fontsize=12)
+    axes[1].set_title('HDSS geometry\nDose sampled throughout the complete target volume',loc='left',fontsize=12)
     if missing:axes[0].text(.025,.05,'No sampled volume: '+', '.join(missing),transform=axes[0].transAxes,fontsize=9)
-    fig.suptitle('Both workflows compared with the native TPS DVH before any export',fontsize=17)
+    fig.suptitle('Same fine dose in both panels · compare structure and volume sampling',fontsize=17)
     fig.legend([Line2D([0],[0],color=x,lw=2) for x in COLORS],[r['target'] for r in rows],ncol=6,loc='lower center',bbox_to_anchor=(.5,.095),frameon=False,fontsize=10)
-    fig.text(.5,.02,'Solid: native TPS reference. Dashed: the specified workflow. One colour per target.\nThe inputs and evaluation differ; full 3D preserves fine information but does not exactly reproduce the TPS curve.',ha='center',fontsize=10)
+    fig.text(.5,.02,'Solid: native TPS before conversion. Dashed: independent readout. One colour per target.\nContours can also be interpolated between planes; that estimates the missing shape rather than restoring the original.',ha='center',fontsize=10)
     fig.tight_layout(rect=[0,.20,1,.94])
     for ext in ['png','svg','pdf']:fig.savefig(ROOT/f'docs/native_workflow_comparison.{ext}',dpi=130,facecolor='white')
+    svg=ROOT/'docs/native_workflow_comparison.svg'
+    svg.write_text('\n'.join(line.rstrip() for line in svg.read_text(encoding='utf-8').splitlines())+'\n',encoding='utf-8',newline='\n')
     plt.close(fig)
-    print('Native/workflow comparison: 12 targets; missing defaults:',len(missing))
+    print('Same-dose comparison: 12 targets; missing plane curves:',len(missing))
 
 if __name__=='__main__':main()

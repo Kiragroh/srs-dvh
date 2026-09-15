@@ -54,9 +54,10 @@ comparison, and unchanged dose plus one method to isolate the transfer effect.
 
 Coarse plane-only evaluation is limited by its spacing in depth. A method which
 reconstructs the body, integrates between planes and handles boundaries can be
-accurate even if its code processes one slice at a time. The actual default
-dicompyler comparison in the accompanying study uses ordinary contours and
-regular exported dose; it is a complete workflow comparison, not proof that
-every TPS uses that algorithm. [dicompyler API](https://dicompyler-core.readthedocs.io/en/latest/_modules/dicompylercore/dvhcalc.html).
+accurate even if its code processes one slice at a time. The main comparison holds fine dose fixed and changes the represented geometry
+and how its volume is sampled. Ordinary contours can also be interpolated
+between planes, but missing original geometry cannot be recovered uniquely.
+Separate dicompyler checks use regular exported dose; they are diagnostics, not
+proof that every TPS uses those algorithms. [dicompyler API](https://dicompyler-core.readthedocs.io/en/latest/_modules/dicompylercore/dvhcalc.html).
 
 [Input contract and tolerances](methods.md) · [Numerical evidence](validation.md)

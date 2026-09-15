@@ -34,18 +34,33 @@ is not the problem.
 The solid curves below are the **native TPS DVHs before any export**. The dashed
 curves show two independent workflows for the same twelve synthetic targets:
 
-- **Left:** ordinary CT-plane contours and regular 1-mm exported dose, evaluated
-  with actual dicompyler-core 0.5.6 defaults.
+- **Left:** ordinary CT-plane contours, evaluated on the supplied planes with
+  fine in-plane sampling and complete plane-volume weights.
 - **Right:** geometry recovered from HDSS and fine source dose, evaluated
   throughout the reconstructed 3D volume at 0.05-mm spacing.
 
+**Both panels use the same fine source dose.** Dose-grid spacing is not the
+spacing used to sample the target volume.
+
 ![Native TPS before export versus ordinary DICOM and complete 3D HDSS workflows](docs/native_workflow_comparison.png)
 
-The right-hand workflow uses fine information that the ordinary export no longer
-contains. It does **not** exactly reproduce the native TPS or have a smaller D98
-difference in every target group. These workflows change both the inputs and the
-evaluation; this is not an isolated test of one algorithm. Boundary-volume
-weighting remains a source of disagreement. [Measured agreement and limits](docs/forward_validation.md).
+The right-hand workflow uses source-geometry information that ordinary contours
+no longer contain. Ordinary contours can also be interpolated between planes,
+but that estimates a missing shape; it does not uniquely restore the original.
+In this same-dose comparison, the plane readout has a smaller mean D98 gap from
+the native TPS in each target group. **Full-volume integration is not a claim
+of closer TPS emulation.** It evaluates a stated 3D body consistently; boundary
+weighting remains a source of disagreement. Geometry preservation and native
+DVH agreement are different tests. [Measured agreement and limits](docs/forward_validation.md).
+
+The ordinary-DICOM comparison also deserves careful sampling. We tested
+dicompyler-core 0.5.6 defaults and four refinement settings across all 120
+target/plan states. An analytical ramp exposed a coordinate mismatch in its
+optional resampling, so that option is shown as a diagnostic, not as evidence
+for an HDSS benefit. The main plane readout interpolates the same fine dose used
+by the complete-3D readout at the actual physical coordinates. Separate diagnostic
+curves use regular exported dose and therefore change the input dose too.
+[Options and reproducible audit](docs/dicompyler_fairness.md).
 
 ## Then isolate what the structure transfer changes
 
