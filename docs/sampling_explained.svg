@@ -127,5 +127,5 @@
 <text x="740" y="302" font-family="Arial,sans-serif" font-size="16" fill="#243d4b" text-anchor="start" font-weight="400">7.5% of total volume</text>
 <text x="740" y="354" font-family="Arial,sans-serif" font-size="14" fill="#536977" text-anchor="start" font-weight="400">Geometric fraction, not DVH error.</text>
 <text x="25" y="397" font-family="Arial,sans-serif" font-size="14" fill="#536977" text-anchor="start" font-weight="400">A/B: schematic sections of the same 2.32-mm sphere; A planes are 1 mm apart.</text>
-<text x="25" y="420" font-family="Arial,sans-serif" font-size="14" fill="#536977" text-anchor="start" font-weight="400">B points illustrate volume sampling, not the separate dose-grid-centre method. C: exact central-slab fractions.</text>
+<text x="25" y="420" font-family="Arial,sans-serif" font-size="15" fill="#536977" text-anchor="start" font-weight="400">A small target needs dose samples throughout its volume, including between the CT planes.</text>
 </svg>

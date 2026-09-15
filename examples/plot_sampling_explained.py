@@ -42,7 +42,7 @@ def main():
         text(740,y+63,f'{value:.1f}% of total volume',16)
     text(740,354,'Geometric fraction, not DVH error.',14,fill='#536977')
     text(25,397,'A/B: schematic sections of the same 2.32-mm sphere; A planes are 1 mm apart.',14,fill='#536977')
-    text(25,420,'B points illustrate volume sampling, not the separate dose-grid-centre method. C: exact central-slab fractions.',14,fill='#536977')
+    text(25,420,'A small target needs dose samples throughout its volume, including between the CT planes.',15,fill='#536977')
     svg.append('</svg>')
     path=Path(__file__).resolve().parents[1]/'docs/sampling_explained.svg'
     path.write_text('\n'.join(svg),encoding='utf-8')

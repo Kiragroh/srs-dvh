@@ -29,31 +29,50 @@ thin and dose changes rapidly near the boundary. A properly reconstructed and
 refined slice-based integrator can also be accurate; merely looping over slices
 is not the problem.
 
-## What the benchmark establishes
+## First compare with the native TPS
 
-The figure keeps **the fine input dose and the complete 3D evaluator fixed**.
-Left: original source geometry and geometry recovered from HDSS overlap.
-Right: replacing that source with ordinary CT-plane contours changes the DVH.
-The difference is due to the supplied geometry under this reconstruction model.
+The solid curves below are the **native TPS DVHs before any export**. The dashed
+curves show two independent workflows for the same twelve synthetic targets:
 
-![Same dose and evaluator: HDSS retains the source readout; CT-plane contours can change it](docs/complete_3d_comparison.png)
+- **Left:** ordinary CT-plane contours and regular 1-mm exported dose, evaluated
+  with actual dicompyler-core 0.5.6 defaults.
+- **Right:** geometry recovered from HDSS and fine source dose, evaluated
+  throughout the reconstructed 3D volume at 0.05-mm spacing.
+
+![Native TPS before export versus ordinary DICOM and complete 3D HDSS workflows](docs/native_workflow_comparison.png)
+
+The right-hand workflow uses fine information that the ordinary export no longer
+contains. It does **not** exactly reproduce the native TPS or have a smaller D98
+difference in every target group. These workflows change both the inputs and the
+evaluation; this is not an isolated test of one algorithm. Boundary-volume
+weighting remains a source of disagreement. [Measured agreement and limits](docs/forward_validation.md).
+
+## Then isolate what the structure transfer changes
+
+Keep **the dose and evaluator identical** for original and transferred geometry.
+Now a changed DVH reflects a changed represented target, rather than a different
+dose field or another TPS's evaluator. This is the comparison the builder enables.
+
+<details>
+<summary>Source preservation check: why the original and decoded HDSS can overlap exactly</summary>
+
+![Same dose and evaluator: recovered HDSS versus ordinary CT-plane contours](docs/complete_3d_comparison.png)
 
 Across 120 GTV/PTV source–HDSS pairs, D98 and integrated volume are identical;
-the largest plotted curve difference is **0.00011 percentage points**. The
-source/recovered masks use the same unsmoothed level-0.5 surface model. Ordinary
-contours use explicit polygon slabs. Those body definitions are stated, not
-silently treated as the same representation.
+the largest plotted curve difference is **0.00011 percentage points**. Decoding
+the HDSS source grid recovers the original binary geometry in this dataset.
+Both use the same unsmoothed level-0.5 surface. Simply treating the exported
+contours as slabs gives a different body and can give nonzero volume/Dice differences.
+Exact source recovery is therefore compatible with those differences, and is
+not a claim of exact native-TPS DVH agreement.
 
-**This is a geometry-preservation result, not a claim to reproduce a TPS.**
-The native TPS retains fine geometry and dose, but its boundary weights can
-differ. Our complete-volume method is not uniformly closer to its stored D98
-than an ordinary default DICOM readout. A favourable-looking DVH is not a
-validation criterion. [Evidence and limits](docs/forward_validation.md).
+</details>
 
-The primary calculation is weighted complete-volume integration. The separate
-[dose-grid-centre option](docs/surface_grid.md) remains available for diagnostics;
-its whole-cell boundary weighting makes it sensitive to grid alignment.
-Neither method can recover geometry or dose detail missing from the input.
+For replanning, calculate a new plan with the same template and evaluate its dose
+on **both the original and reimported targets**. New optimisation adds variability;
+it must be distinguished from the unchanged-dose geometry comparison.
+
+Neither fine integration nor HDSS can restore information already lost from the input.
 [Illustrated explanation](docs/dvh_explained.md) · [Calculation details](docs/methods.md)
 
 ## Install and run

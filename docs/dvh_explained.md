@@ -44,10 +44,11 @@ The [paired example](complete_3d_comparison.png) shows source preservation under
 that stated model. Replanning is a separate experiment: evaluate the new dose
 on both the original and returned geometries.
 
-The native TPS is a comparator, not a fitting target. It can count boundary
-volume differently. Complete-volume integration does not uniformly improve
-agreement with every native scalar; numerical accuracy, source preservation
-and native-TPS agreement are three different checks.
+The [native-TPS comparison](native_workflow_comparison.png) uses solid native
+curves before export and dashed independent readouts. The full 3D workflow keeps
+fine source information, but does not exactly reproduce the TPS or improve every
+scalar. It can count boundary volume differently. Use the native curve as a
+comparison, and unchanged dose plus one method to isolate the transfer effect.
 
 ## What is meant by “slice by slice”
 
@@ -57,10 +58,5 @@ accurate even if its code processes one slice at a time. The actual default
 dicompyler comparison in the accompanying study uses ordinary contours and
 regular exported dose; it is a complete workflow comparison, not proof that
 every TPS uses that algorithm. [dicompyler API](https://dicompyler-core.readthedocs.io/en/latest/_modules/dicompylercore/dvhcalc.html).
-
-The optional [surface/grid diagnostic](surface_grid.md) counts existing dose-grid
-centres inside a surface and assigns whole-cell weights. It is distinct from the
-primary complete-volume integration and is not selected merely because a native
-curve looks closer.
 
 [Input contract and tolerances](methods.md) · [Numerical evidence](validation.md)
