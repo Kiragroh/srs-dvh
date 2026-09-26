@@ -206,7 +206,19 @@ Research software; clinical use requires separate commissioning and validation.
 
 ## Cite and contribute
 
+### Full-paper concept and reproducible benchmark figures
+
+The [HDSS paper-concept package](studies/hdss-paper-concept/README.md) contains a
+Medical Physics research-article outline, five proposed main figures, editable
+tables, captions, synthetic-target numeric extracts and an anatomy-free sampling
+example. Reproduce the plots or contribute an observed transfer route. No patient
+image pixels or local clinical cohort are included. Code is MIT; the derived
+benchmark data and associated figures in that folder have separate CC BY-NC 4.0
+terms, documented alongside their public anatomical provenance. This is a paper
+concept, not a published validation study.
+
 Use [CITATION.cff](CITATION.cff) and the specific release or commit for reproducible
 references. No DOI or peer-reviewed validation paper is claimed by this release.
 Reproducible issues and pull requests are welcome; use synthetic examples rather
-than patient information. Licensed under [MIT](LICENSE).
+than patient information. Software is licensed under [MIT](LICENSE); see the
+study-specific notice above for the additional benchmark data.

@@ -1,0 +1,29 @@
+{
+  "checked": "2026-09-26",
+  "anatomy_doi": "10.5281/zenodo.17486320",
+  "anatomy_license": "cc-by-nc-4.0",
+  "anatomy_subset": "meningioma/sub-01",
+  "source_authors": [
+    "Shun Yao",
+    "Yiheng Tan",
+    "Jiaming Wang"
+  ],
+  "anatomy_included": false,
+  "clinical_local_data_included": false,
+  "synthetic_targets": 24,
+  "modifications": [
+    "1-mm slice spacing derived from existing 0.5-mm slices; 0.5-mm in-plane pixels",
+    "Simulated oblique MR at 30 degrees; no independent registration-error experiment",
+    "326 CT voxels above 3071 HU clipped to 3071 HU for research planning",
+    "Research sex label F; synthetic targets unrelated to actual lesions"
+  ],
+  "n_fixed_dose": 480,
+  "n_replan_ptv_states": 96,
+  "n_unique_target_designs": 24,
+  "observed_monaco": {
+    "GTV": 24,
+    "PTV_1mm": 17,
+    "PTV_2mm": 7
+  },
+  "model_generated_monaco_included": false
+}

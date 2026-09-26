@@ -1,0 +1,5 @@
+{
+  "method": "Fine-dose full-surface integration at 0.05 mm; source-grid HDSS recovery independently verified",
+  "zero_hdss_dvh_differences": 72,
+  "explanation": "HDSS dose evaluation recovers the same source-grid surface. This equality is a data recovery check, not independent evidence of receiving-TPS accuracy. Dice describes binary/contour-slab bodies, not the surface used for this DVH."
+}

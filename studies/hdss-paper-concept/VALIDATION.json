@@ -1,0 +1,27 @@
+{
+  "numerical_rows": 480,
+  "replan_states": 96,
+  "summary_groups": 21,
+  "analytic_controls": 12,
+  "review_archive_scan": "passed",
+  "review_archive_file_count": 39,
+  "slides": 24,
+  "viewports": 2,
+  "page_errors": [],
+  "external_requests": [],
+  "layout_failures": [],
+  "scope": "Concept figures, numeric extracts, analytical example and author-neutral archive; not clinical validation or ethics determination.",
+  "input_sha256": {
+    "fixed_dose.csv": "9e3bfe4cce3e50df5f97a0050218861391385537d9b6993a3f0a84d57b046c9d",
+    "mr_ct.csv": "7b792d196ad6afcf75e9a55fdb203d53df131e0c86cd045d18aff1310f64f8d6",
+    "native_curves.json.gz": "6b8767811ff25c82df360b1341300cb2df1d6553f253e9bb9b660c589af6d309",
+    "native_metrics.csv": "9a099c3c6f44f92814329ea91a21a00e4d1684fc888869c1a222ca0a4fc48d61",
+    "numerical_refinement.json": "eb7ff3e123625673b35bb562b96411f472b8232daf34c593942fb16d7789ed62",
+    "provenance.json": "8d31ef1987305a45dfff84f23186f719334cd720becf035be3cae1f46c486cea",
+    "ptv13_common_curves.json": "48088809f1e8f16b378c29e518e905ace2d71d6df1302a5bc34fdfd66092bf54",
+    "replanning.csv": "bd99025e9e19cf91f990b963e2b6191805ba640380d7430c46615f34b5b38f70",
+    "source_grid_check.json": "4e1c40038b4701188929a73896e97a96f9cc4263c7b2d06d1efd8f665740f51c",
+    "target_design.csv": "aa1037cac867912364225cd21f8fb16c636a68cb2e1b3067e86efed5a5390eb2",
+    "target_positions.csv": "0cff84451a87e20a2240c5aca6cc449fcb3e3735ebfcc5d5e07de5fb517a1f92"
+  }
+}
